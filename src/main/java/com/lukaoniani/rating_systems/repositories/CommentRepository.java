@@ -10,6 +10,8 @@ public interface CommentRepository extends JpaRepository<Comment, Integer> {
     List<Comment> findBySellerId(Integer sellerId);
     List<Comment> findBySellerIdAndApproved(Integer sellerId, boolean approved);
 
+    int countBySellerId(Integer sellerId);
+
     @Query("SELECT AVG(c.rating) FROM Comment c WHERE c.seller.id = ?1 AND c.approved = true")
     Double getAverageRatingForSeller(Integer sellerId);
 }

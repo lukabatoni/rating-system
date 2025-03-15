@@ -73,6 +73,8 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return emailConfirmed && (role != Role.SELLER || approved);
+        return true;
+        //return emailConfirmed && (role != Role.SELLER || approved);
+
     }
 }

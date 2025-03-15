@@ -13,4 +13,7 @@ public class CommentRequestDto {
     private String message;
     private Integer rating;
     private Integer sellerId;
+    private String sellerFirstName;
+    private String sellerLastName;
+    private String sellerEmail;
 }
