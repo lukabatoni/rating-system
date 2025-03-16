@@ -41,16 +41,4 @@ public class CommentController {
     }
 
 
-//    @PutMapping("/{commentId}/approve")
-//    public ResponseEntity<CommentResponseDto> approveComment(@PathVariable Integer commentId) {
-//        return ResponseEntity.ok(commentService.approveComment(commentId));
-//    }
-//
-//    @DeleteMapping("/{commentId}")
-//    public ResponseEntity<Void> deleteComment(
-//            @PathVariable Integer commentId,
-//            @AuthenticationPrincipal User user) {
-//        commentService.deleteComment(commentId, user.getId());
-//        return ResponseEntity.noContent().build();
-//    }
 }

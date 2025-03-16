@@ -26,6 +26,7 @@ public class SecurityConfiguration {
                         // Public endpoints
                         .requestMatchers(HttpMethod.GET, "/api/sellers", "/api/sellers/top", "/api/comments/seller/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/auth/check_code").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/comments").permitAll()
 
                         // Game Objects endpoints

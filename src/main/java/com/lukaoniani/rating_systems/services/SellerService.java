@@ -7,7 +7,6 @@ import com.lukaoniani.rating_systems.models.User;
 import com.lukaoniani.rating_systems.repositories.CommentRepository;
 import com.lukaoniani.rating_systems.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.validator.constraints.Range;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -80,15 +79,43 @@ public class SellerService {
                 .collect(Collectors.toList());
     }
 
+    public Double calculateSellerRating(Integer sellerId) {
+        return commentRepository.getAverageRatingForSeller(sellerId);
+    }
+
     public List<SellerResponseDto> getTopSellers(int limit) {
-        List<User> sellers = userRepository.findByRoleAndApproved(Role.SELLER, true);
+        // Fetch all sellers with the SELLER role
+        List<User> sellers = userRepository.findByRole(Role.SELLER);
 
         return sellers.stream()
-                .map(this::mapToDto)
-                .sorted((s1, s2) -> Double.compare(
-                        s2.getAverageRating() != null ? s2.getAverageRating() : 0.0,
-                        s1.getAverageRating() != null ? s1.getAverageRating() : 0.0))
+                .map(seller -> {
+                    // Calculate the average rating for the seller
+                    Double averageRating = commentRepository.getAverageRatingForSeller(seller.getId());
+
+                    // Count the number of approved comments for the seller
+                    int commentCount = commentRepository.countBySellerIdAndApproved(seller.getId(), true);
+
+                    // Map the seller to SellerResponseDto
+                    return mapToDto(seller);
+                })
+                .sorted((s1, s2) -> Double.compare(s2.getAverageRating(), s1.getAverageRating())) // Sort by average rating (descending)
                 .limit(limit)
+                .collect(Collectors.toList());
+    }
+
+    public List<SellerResponseDto> filterSellersByGameAndRating(String gameTitle, Double minRating, Double maxRating) {
+        // Fetch sellers filtered by game title and rating range directly from the database
+        List<User> sellers = userRepository.findSellersByGameAndRating(gameTitle, minRating, maxRating);
+
+        return sellers.stream()
+                .map(seller -> {
+                    // Calculate the average rating and comment count for the seller
+                    Double averageRating = commentRepository.getAverageRatingForSeller(seller.getId());
+                    int commentCount = commentRepository.countBySellerIdAndApproved(seller.getId(), true);
+
+                    // Map the seller to SellerResponseDto
+                    return mapToDto(seller);
+                })
                 .collect(Collectors.toList());
     }
 
@@ -105,7 +132,7 @@ public class SellerService {
                 .email(seller.getEmail())
                 .createdAt(seller.getCreatedAt())
                 .approved(seller.isApproved())
-                .averageRating(averageRating)
+                .averageRating(averageRating != null ? averageRating : 0.0)
                 .commentCount(commentCount)
                 .build();
     }
