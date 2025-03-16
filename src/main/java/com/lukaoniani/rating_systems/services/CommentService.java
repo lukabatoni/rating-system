@@ -76,6 +76,7 @@ public class CommentService {
         return mapToDto(comment);
     }
 
+
     public List<CommentResponseDto> getCommentsBySeller(Integer sellerId, boolean approvedOnly) {
         List<Comment> comments;
         if (approvedOnly) {
@@ -109,15 +110,45 @@ public class CommentService {
         return mapToDto(comment);
     }
 
+    public CommentResponseDto updateComment(Integer commentId, CommentRequestDto commentRequestDto, Integer authorId) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Comment not found"));
+
+        // Ensure the author is updating their own comment
+        if (!comment.getAuthor().getId().equals(authorId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only update your own comments");
+        }
+
+        // Update the comment
+        comment.setMessage(commentRequestDto.getMessage());
+        comment.setRating(commentRequestDto.getRating());
+
+        comment = commentRepository.save(comment);
+
+        return mapToDto(comment);
+    }
+
+
     public void deleteComment(Integer commentId, Integer userId) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Comment not found"));
 
-        if (!comment.getAuthor().getId().equals(userId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only delete your own comments");
+        // Check if the user is either the comment author or the seller
+        boolean isAuthor = comment.getAuthor() != null && comment.getAuthor().getId().equals(userId);
+        boolean isSeller = comment.getSeller().getId().equals(userId);
+
+        if (!isAuthor && !isSeller) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only delete your own comments or comments on your account");
         }
 
         commentRepository.delete(comment);
+    }
+
+    public CommentResponseDto getCommentById(Integer commentId) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Comment not found"));
+
+        return mapToDto(comment);
     }
 
     private CommentResponseDto mapToDto(Comment comment) {
