@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
+@Repository
 public interface UserRepository extends JpaRepository<User, Integer> {
     Optional<User> findByEmail(String email);
     List<User> findByRole(Role role);
@@ -18,8 +19,9 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     @Query("SELECT u FROM User u " +
             "WHERE u.role = 'SELLER' " +
             "AND EXISTS (SELECT g FROM GameObject g WHERE g.user.id = u.id AND g.title = :gameTitle) " +
-            "AND (SELECT COALESCE(AVG(c.rating), 0.0) FROM Comment c WHERE c.seller.id = u.id AND c.approved = true) BETWEEN :minRating AND :maxRating " +
-            "ORDER BY (SELECT COALESCE(AVG(c.rating), 0.0) FROM Comment c WHERE c.seller.id = u.id AND c.approved = true) DESC")
+            "AND (SELECT AVG(c.rating) FROM Comment c WHERE c.seller.id = u.id AND c.approved = true) " +
+            "BETWEEN :minRating AND :maxRating " +
+            "ORDER BY (SELECT AVG(c.rating) FROM Comment c WHERE c.seller.id = u.id AND c.approved = true) DESC")
     List<User> findSellersByGameAndRating(
             @Param("gameTitle") String gameTitle,
             @Param("minRating") Double minRating,

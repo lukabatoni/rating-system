@@ -45,7 +45,6 @@ public class CommentController {
         return ResponseEntity.ok(comments);
     }
 
-    //get certain comment of user
     @GetMapping("/{sellerId}/comments/{commentId}")
     public ResponseEntity<CommentResponseDto> getCommentById(
             @PathVariable Integer sellerId,

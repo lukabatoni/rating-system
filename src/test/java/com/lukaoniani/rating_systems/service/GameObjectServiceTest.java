@@ -70,7 +70,7 @@ public class GameObjectServiceTest {
 
         User user = new User();
         user.setId(1);
-        user.setRole(Role.USER); // Not a seller
+        user.setRole(Role.USER);
 
         when(userRepository.findById(1)).thenReturn(Optional.of(user));
 

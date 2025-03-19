@@ -67,7 +67,6 @@ public class AuthService {
                 )
         );
 
-        // Fetch the user from the repository
         var user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
@@ -81,7 +80,6 @@ public class AuthService {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Seller not approved");
         }
 
-        // Generate a JWT token
         var token = jwtService.generateToken(user);
 
         return AuthenticationResponseDto.builder()
@@ -90,7 +88,6 @@ public class AuthService {
     }
 
     public void sendPasswordResetCode(String email) {
-        // Check if the user exists
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
@@ -106,21 +103,17 @@ public class AuthService {
     }
 
     public void resetPassword(String code, String newPassword) {
-        // Find the email associated with the reset code
         String email = redisService.getEmailByResetCode(code);
         if (email == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid or expired reset code");
         }
 
-        // Find the user
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
-        // Update the user's password
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
 
-        // Delete the reset code from Redis
         redisService.deleteConfirmationCode(email);
     }
 

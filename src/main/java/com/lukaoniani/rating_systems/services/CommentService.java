@@ -34,12 +34,10 @@ public class CommentService {
         // Find the seller (this is required)
         User seller;
         if (commentRequestDto.getSellerId() != null) {
-            // Try to find existing seller
             seller = userRepository.findById(commentRequestDto.getSellerId())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Seller not found"));
         } else {
             // Create a new seller since sellerId is null
-            // Check required fields for new seller
             if (commentRequestDto.getSellerEmail() == null ||
                     commentRequestDto.getSellerFirstName() == null ||
                     commentRequestDto.getSellerLastName() == null) {
@@ -53,16 +51,13 @@ public class CommentService {
                     commentRequestDto.getSellerEmail()
             );
 
-            // Get the DTO from service
             SellerResponseDto sellerResponseDto = sellerService.createSeller(sellerRequestDto);
 
-            // Fetch the actual entity using the ID from the response
             seller = userRepository.findById(sellerResponseDto.getId())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
                             "Failed to retrieve created seller"));
         }
 
-        // Create the comment object, allowing for null author (anonymous comment)
         Comment comment = Comment.builder()
                 .message(commentRequestDto.getMessage())
                 .rating(commentRequestDto.getRating())
@@ -114,12 +109,10 @@ public class CommentService {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Comment not found"));
 
-        // Ensure the author is updating their own comment
         if (!comment.getAuthor().getId().equals(authorId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only update your own comments");
         }
 
-        // Update the comment
         comment.setMessage(commentRequestDto.getMessage());
         comment.setRating(commentRequestDto.getRating());
 

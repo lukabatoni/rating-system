@@ -82,6 +82,7 @@ public class SellerService {
 
         return sellers.stream()
                 .map(seller -> {
+
                     // Calculate the average rating for the seller
                     Double averageRating = commentRepository.getAverageRatingForSeller(seller.getId());
 
@@ -97,11 +98,13 @@ public class SellerService {
     }
 
     public List<SellerResponseDto> filterSellersByGameAndRating(String gameTitle, Double minRating, Double maxRating) {
+
         // Fetch sellers filtered by game title and rating range directly from the database
         List<User> sellers = userRepository.findSellersByGameAndRating(gameTitle, minRating, maxRating);
 
         return sellers.stream()
                 .map(seller -> {
+
                     // Calculate the average rating and comment count for the seller
                     Double averageRating = commentRepository.getAverageRatingForSeller(seller.getId());
                     int commentCount = commentRepository.countBySellerIdAndApproved(seller.getId(), true);
@@ -115,7 +118,6 @@ public class SellerService {
     private SellerResponseDto mapToDto(User seller) {
         Double averageRating = commentRepository.getAverageRatingForSeller(seller.getId());
 
-        // Instead of using seller.getComments(), use the commentRepository to get the count
         int commentCount = commentRepository.countBySellerId(seller.getId());
 
         return SellerResponseDto.builder()

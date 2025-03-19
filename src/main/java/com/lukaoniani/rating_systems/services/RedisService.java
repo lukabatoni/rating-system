@@ -26,7 +26,6 @@ public class RedisService {
     }
 
     public String getEmailByResetCode(String code) {
-        // Iterate through all keys to find the email associated with the reset code
         Set<String> keys = redisTemplate.keys("*");
         for (String key : keys) {
             String storedCode = redisTemplate.opsForValue().get(key);
