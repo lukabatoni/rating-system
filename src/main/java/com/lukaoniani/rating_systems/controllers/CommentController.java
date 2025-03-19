@@ -4,7 +4,6 @@ import com.lukaoniani.rating_systems.dto.CommentRequestDto;
 import com.lukaoniani.rating_systems.dto.CommentResponseDto;
 import com.lukaoniani.rating_systems.models.User;
 import com.lukaoniani.rating_systems.services.CommentService;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

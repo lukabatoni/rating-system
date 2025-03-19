@@ -3,22 +3,18 @@ package com.lukaoniani.rating_systems.services;
 import com.lukaoniani.rating_systems.dto.AuthenticationRequestDto;
 import com.lukaoniani.rating_systems.dto.AuthenticationResponseDto;
 import com.lukaoniani.rating_systems.dto.RegisterRequestDto;
-import com.lukaoniani.rating_systems.dto.ResetPasswordRequest;
 import com.lukaoniani.rating_systems.enums.Role;
 import com.lukaoniani.rating_systems.models.User;
 import com.lukaoniani.rating_systems.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -28,8 +24,6 @@ public class AuthService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final RedisService redisService;
-    //private final EmailService emailService;
-    //private final RedisTemplate<String, String> redisTemplate;
 
     public AuthenticationResponseDto register(RegisterRequestDto request) {
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {

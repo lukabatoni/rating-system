@@ -48,9 +48,4 @@ public class SellerController {
         return ResponseEntity.ok(sellerService.createSeller(sellerRequestDto));
     }
 
-//    @PutMapping("/{sellerId}/approve")
-//    public ResponseEntity<SellerResponseDto> approveSeller(@PathVariable Integer sellerId) {
-//        return ResponseEntity.ok(sellerService.approveSeller(sellerId));
-//    }
-
 }

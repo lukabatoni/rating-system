@@ -22,7 +22,6 @@ public class SellerService {
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
     private final PasswordEncoder passwordEncoder;
-//    private final EmailService emailService;
 
     public SellerResponseDto createSeller(SellerRequestDto sellerRequestDto) {
         if (userRepository.findByEmail(sellerRequestDto.getEmail()).isPresent()) {
@@ -43,10 +42,6 @@ public class SellerService {
 
         seller = userRepository.save(seller);
 
-        // Send temporary password to seller's email
-//        emailService.sendTempPassword(seller.getEmail(), tempPassword);
-
-
         return mapToDto(seller);
     }
 
@@ -61,8 +56,6 @@ public class SellerService {
         seller.setApproved(true);
         seller = userRepository.save(seller);
 
-        // Notify seller about approval
-//        emailService.sendApprovalNotification(seller.getEmail());
         return mapToDto(seller);
     }
 

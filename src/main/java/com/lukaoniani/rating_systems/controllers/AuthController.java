@@ -8,15 +8,11 @@ import com.lukaoniani.rating_systems.models.User;
 import com.lukaoniani.rating_systems.repositories.UserRepository;
 import com.lukaoniani.rating_systems.services.AuthService;
 import com.lukaoniani.rating_systems.services.RedisService;
-import com.lukaoniani.rating_systems.services.SellerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.util.HashMap;
-import java.util.Map;
 
 
 @RestController
