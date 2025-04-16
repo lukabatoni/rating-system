@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/rating_system
+    url: jdbc:postgresql://localhost:5433/rating_system
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
@@ -19,3 +19,9 @@ spring:
         format_sql: true
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+  jmx:
+    enabled: false
+logging:
+  level:
+    root: info
+    com.lukaoniani: debug
