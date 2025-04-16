@@ -91,8 +91,8 @@ public class SellerService {
           // Map the seller to SellerResponseDto
           return mapToDto(seller);
         })
-        //long
-        .sorted((s1, s2) -> Double.compare(s2.getAverageRating(), s1.getAverageRating())) // Sort by average rating (descending)
+        .sorted((s1, s2) ->
+            Double.compare(s2.getAverageRating(), s1.getAverageRating())) // Sort by average rating (descending)
         .limit(limit)
         .collect(Collectors.toList());
   }
