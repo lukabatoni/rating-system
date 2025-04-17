@@ -1,0 +1,41 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001
+      author: lukaoniani
+      changes:
+        - createTable:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  type: SERIAL
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: first_name
+                  type: VARCHAR(255)
+              - column:
+                  name: last_name
+                  type: VARCHAR(255)
+              - column:
+                  name: email
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: password
+                  type: VARCHAR(255)
+              - column:
+                  name: role
+                  type: VARCHAR(50)
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+              - column:
+                  name: approved
+                  type: BOOLEAN
+              - column:
+                  name: email_confirmed
+                  type: BOOLEAN

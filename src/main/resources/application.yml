@@ -1,21 +1,37 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/rating_system
+    url: jdbc:postgresql://localhost:5433/rating_system
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
+
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+
   data:
     redis:
       host: localhost
       port: 6379
       password:
       timeout: 2000
+
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: none     # ❌ Disable Hibernate schema updates
     show-sql: true
     properties:
       hibernate:
         format_sql: true
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+  # ✅ Master changelog file path
+
+  jmx:
+    enabled: false
+
+logging:
+  level:
+    root: info
+    com.lukaoniani: debug
