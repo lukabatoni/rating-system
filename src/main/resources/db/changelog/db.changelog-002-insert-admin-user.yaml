@@ -1,0 +1,32 @@
+databaseChangeLog:
+  - changeSet:
+      id: 002
+      author: lukaoniani
+      changes:
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: first_name
+                  value: Admin
+              - column:
+                  name: last_name
+                  value: User
+              - column:
+                  name: email
+                  value: admin@example.com
+              - column:
+                  name: password
+                  value: $2a$10$A0FzO6y8qG0vGcOnM7BkaeOq3ewk6Z0RWpu/DkM/GK1AgUelKd8eO
+              - column:
+                  name: role
+                  value: ADMIN
+              - column:
+                  name: created_at
+                  valueDate: 2025-04-17T12:00:00
+              - column:
+                  name: approved
+                  valueBoolean: true
+              - column:
+                  name: email_confirmed
+                  valueBoolean: true
