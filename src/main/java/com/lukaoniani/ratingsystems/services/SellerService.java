@@ -3,6 +3,7 @@ package com.lukaoniani.ratingsystems.services;
 import com.lukaoniani.ratingsystems.dto.SellerRequestDto;
 import com.lukaoniani.ratingsystems.dto.SellerResponseDto;
 import com.lukaoniani.ratingsystems.enums.Role;
+import com.lukaoniani.ratingsystems.mappers.SellerMapper;
 import com.lukaoniani.ratingsystems.models.User;
 import com.lukaoniani.ratingsystems.repositories.CommentRepository;
 import com.lukaoniani.ratingsystems.repositories.UserRepository;
@@ -21,23 +22,26 @@ public class SellerService {
   private final UserRepository userRepository;
   private final CommentRepository commentRepository;
   private final PasswordEncoder passwordEncoder;
+  private final SellerMapper sellerMapper;
+
+  // Error message constants
+  private static final String ERROR_EMAIL_IN_USE = "Email already in use";
+  private static final String ERROR_SELLER_NOT_FOUND = "Seller not found";
+  private static final String ERROR_NOT_SELLER = "User is not a seller";
 
   public SellerResponseDto createSeller(SellerRequestDto sellerRequestDto) {
     if (userRepository.findByEmail(sellerRequestDto.getEmail()).isPresent()) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email already in use");
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ERROR_EMAIL_IN_USE);
     }
 
     String tempPassword = UUID.randomUUID().toString().substring(0, 8);
 
-    User seller = User.builder()
-        .firstName(sellerRequestDto.getFirstName())
-        .lastName(sellerRequestDto.getLastName())
-        .email(sellerRequestDto.getEmail())
-        .password(passwordEncoder.encode(tempPassword))
-        .role(Role.SELLER)
-        .approved(false)
-        .emailConfirmed(false)
-        .build();
+    // Convert DTO to entity with MapStruct, then set additional fields
+    User seller = sellerMapper.toEntity(sellerRequestDto);
+    seller.setPassword(passwordEncoder.encode(tempPassword));
+    seller.setRole(Role.SELLER);
+    seller.setApproved(false);
+    seller.setEmailConfirmed(false);
 
     seller = userRepository.save(seller);
 
@@ -46,10 +50,10 @@ public class SellerService {
 
   public SellerResponseDto approveSeller(Integer sellerId) {
     User seller = userRepository.findById(sellerId)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Seller not found"));
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ERROR_SELLER_NOT_FOUND));
 
     if (seller.getRole() != Role.SELLER) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is not a seller");
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ERROR_NOT_SELLER);
     }
 
     seller.setApproved(true);
@@ -80,18 +84,7 @@ public class SellerService {
     List<User> sellers = userRepository.findByRole(Role.SELLER);
 
     return sellers.stream()
-        .map(seller -> {
-
-          // Calculate the average rating for the seller
-          Double averageRating = commentRepository.getAverageRatingForSeller(seller.getId());
-
-          // Count the number of approved comments for the seller
-          int commentCount = commentRepository.countBySellerIdAndApproved(seller.getId(), true);
-
-          // Map the seller to SellerResponseDto
-          return mapToDto(seller);
-        })
-        //long
+        .map(this::mapToDto)
         .sorted((s1, s2) ->
             Double.compare(s2.getAverageRating(), s1.getAverageRating())) // Sort by average rating (descending)
         .limit(limit)
@@ -99,37 +92,24 @@ public class SellerService {
   }
 
   public List<SellerResponseDto> filterSellersByGameAndRating(String gameTitle, Double minRating, Double maxRating) {
-
     // Fetch sellers filtered by game title and rating range directly from the database
     List<User> sellers = userRepository.findSellersByGameAndRating(gameTitle, minRating, maxRating);
 
     return sellers.stream()
-        .map(seller -> {
-
-          // Calculate the average rating and comment count for the seller
-          Double averageRating = commentRepository.getAverageRatingForSeller(seller.getId());
-          int commentCount = commentRepository.countBySellerIdAndApproved(seller.getId(), true);
-
-          // Map the seller to SellerResponseDto
-          return mapToDto(seller);
-        })
+        .map(this::mapToDto)
         .collect(Collectors.toList());
   }
 
   private SellerResponseDto mapToDto(User seller) {
     Double averageRating = commentRepository.getAverageRatingForSeller(seller.getId());
-
     int commentCount = commentRepository.countBySellerId(seller.getId());
 
-    return SellerResponseDto.builder()
-        .id(seller.getId())
-        .firstName(seller.getFirstName())
-        .lastName(seller.getLastName())
-        .email(seller.getEmail())
-        .createdAt(seller.getCreatedAt())
-        .approved(seller.isApproved())
-        .averageRating(averageRating != null ? averageRating : 0.0)
-        .commentCount(commentCount)
-        .build();
+    // Use MapStruct for the basic mapping
+    SellerResponseDto dto = sellerMapper.toDto(seller);
+
+    // Use @Context parameters for the calculated fields
+    sellerMapper.setRatingAndCommentCount(seller, dto, averageRating, commentCount);
+
+    return dto;
   }
 }
