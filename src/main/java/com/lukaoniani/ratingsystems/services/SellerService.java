@@ -108,7 +108,7 @@ public class SellerService {
     SellerResponseDto dto = sellerMapper.toDto(seller);
 
     // Use @Context parameters for the calculated fields
-    sellerMapper.setRatingAndCommentCount(seller, dto, averageRating, commentCount);
+   // sellerMapper.setRatingAndCommentCount(dto, averageRating, commentCount);
 
     return dto;
   }

@@ -26,7 +26,7 @@ public interface SellerMapper {
   SellerResponseDto toDto(User user);
 
   @AfterMapping
-  default void setRatingAndCommentCount(User user, @MappingTarget SellerResponseDto dto,
+  default void setRatingAndCommentCount(@MappingTarget SellerResponseDto dto,
                                         @Context Double averageRating,
                                         @Context Integer commentCount) {
     dto.setAverageRating(averageRating != null ? averageRating : 0.0);

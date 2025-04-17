@@ -1,10 +1,9 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5433/rating_system
+    url: jdbc:postgresql://localhost:5432/rating_system
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
-
   liquibase:
     enabled: true
     change-log: classpath:db/changelog/db.changelog-master.yaml

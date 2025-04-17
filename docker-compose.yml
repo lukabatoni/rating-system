@@ -1,6 +1,26 @@
-version: '3.8'
-
 services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: rating_system_app
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/rating_system
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+      - SPRING_REDIS_HOST=redis
+      - SPRING_REDIS_PORT=6379
+      - SPRING_LIQUIBASE_URL=jdbc:postgresql://postgres:5432/rating_system
+      - SPRING_LIQUIBASE_USER=postgres
+      - SPRING_LIQUIBASE_PASSWORD=postgres
+      - SPRING_LIQUIBASE_CHANGE_LOG=classpath:db/changelog/db.changelog-master.yaml
+
+    ports:
+      - "8080:8080"
+
   postgres:
     image: postgres:latest
     container_name: postgres_db
@@ -9,10 +29,7 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: rating_system
     ports:
-      - "5433:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-
+      - "5432:5432"
   redis:
     image: redis:latest
     container_name: redis_cache
